@@ -20,7 +20,7 @@ public class Checker {
         if (!cardFromCVV.matches("^\\d{3}$")) {
             throw new BadRequestException(new ExceptionData("CVV карты должен состоять из 3 цифр", 1003));
         }
-        if (!cardFromValidTill.matches("^\\d{2}(\\/)\\d{2}$")) {
+        if (!cardFromValidTill.matches("^\\d{2}(/)\\d{2}$")) {
             throw new BadRequestException(new ExceptionData("Срок действия карты должен быть указан в формате MM/YY", 1004));
         }
 

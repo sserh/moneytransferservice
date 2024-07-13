@@ -1,10 +1,6 @@
 package ru.raccoon.moneytransferservice.utils;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import ru.raccoon.moneytransferservice.exception.BadRequestException;
-import ru.raccoon.moneytransferservice.exception.ExceptionData;
-
-import java.util.Calendar;
 
 public final class UtilClass {
 

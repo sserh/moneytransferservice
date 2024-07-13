@@ -19,12 +19,12 @@ public class Controller {
     }
 
     @PostMapping("/transfer")
-    public ResponseEntity<OperationId> getTransferParams(@RequestBody Transfer transfer) throws Exception {
+    public ResponseEntity<OperationId> getTransferParams(@RequestBody Transfer transfer) {
         return transferService.getTransferResponse(transfer);
     }
 
     @PostMapping("/confirmOperation")
-    public ResponseEntity<OperationId> confirmOperation(@RequestBody ConfirmationData confirmationData) throws Exception {
+    public ResponseEntity<OperationId> confirmOperation(@RequestBody ConfirmationData confirmationData) {
         return transferService.getConfirmationResponse(confirmationData);
     }
 }
