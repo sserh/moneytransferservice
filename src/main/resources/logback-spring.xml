@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <!--https://docs.spring.io/spring-boot/docs/2.7.6/reference/html/features.html#features.logging-->
+    <!--https://docs.spring.io/spring-boot/docs/2.7.6/reference/html/howto.html#howto.logging-->
+    <!--https://www.baeldung.com/spring-boot-logging-->
+    <!--https://github.com/spring-projects/spring-boot/blob/v2.7.6/spring-boot-project/spring-boot/src/main/resources/org/springframework/boot/logging/logback/-->
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+
+    <property name="LOG" value="log-folder"/>
+
+    <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{dd.MM.yyyy HH:mm:ss} %p : %m%n</Pattern>
+            <charset>${FILE_LOG_CHARSET}</charset>
+        </encoder>
+
+        <file>${LOG}/log.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG}/archived/my-log-file-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <cleanHistoryOnStart>${LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
+            <maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE:-10MB}</maxFileSize>
+            <totalSizeCap>${LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP:-0}</totalSizeCap>
+            <maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY:-7}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <logger name="my-logger-name" level="info">
+        <appender-ref ref="ROLLING_FILE"/>
+    </logger>
+
+</configuration>
