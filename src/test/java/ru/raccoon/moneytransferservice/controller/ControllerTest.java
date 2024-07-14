@@ -2,20 +2,16 @@ package ru.raccoon.moneytransferservice.controller;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import ru.raccoon.moneytransferservice.exception.BadRequestException;
 import ru.raccoon.moneytransferservice.exception.ExceptionData;
-import ru.raccoon.moneytransferservice.exception.ISEException;
 import ru.raccoon.moneytransferservice.model.Amount;
 import ru.raccoon.moneytransferservice.model.ConfirmationData;
 import ru.raccoon.moneytransferservice.model.OperationId;
 import ru.raccoon.moneytransferservice.model.Transfer;
 import ru.raccoon.moneytransferservice.service.TransferService;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ControllerTest {
 

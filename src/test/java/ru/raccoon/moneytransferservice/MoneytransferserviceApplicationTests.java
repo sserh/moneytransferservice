@@ -1,10 +1,8 @@
 package ru.raccoon.moneytransferservice;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -12,13 +10,10 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.shaded.org.bouncycastle.asn1.ocsp.Request;
 import ru.raccoon.moneytransferservice.model.Amount;
-import ru.raccoon.moneytransferservice.model.OperationId;
 import ru.raccoon.moneytransferservice.model.Transfer;
 
 import java.net.URI;
-import java.util.Objects;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MoneytransferserviceApplicationTests {
