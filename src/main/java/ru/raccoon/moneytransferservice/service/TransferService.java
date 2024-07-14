@@ -32,12 +32,12 @@ public class TransferService {
 
     public ResponseEntity<OperationId> getTransferResponse(Transfer transfer) {
 
-        this.cardFromNumber = transfer.getCardFromNumber();
-        this.cardToNumber = transfer.getCardToNumber();
-        this.cardFromValidTill = transfer.getCardFromValidTill();
-        this.cardFromCVV = transfer.getCardFromCVV();
-        this.value = transfer.getAmount().getValue()/100;
-        this.currency = transfer.getAmount().getCurrency();
+        this.cardFromNumber = transfer.cardFromNumber();
+        this.cardToNumber = transfer.cardToNumber();
+        this.cardFromValidTill = transfer.cardFromValidTill();
+        this.cardFromCVV = transfer.cardFromCVV();
+        this.value = transfer.amount().value()/100;
+        this.currency = transfer.amount().currency();
         this.transferSum = value*99d/100;
         this.comSum = value - transferSum;
         this.operationId = UtilClass.generateOperationId();
@@ -60,7 +60,7 @@ public class TransferService {
 
         //проверяем совпадение Id операции и кода подтверждения
         try {
-            Checker.checkIdAndCode(operationId, confirmationData.getOperationId(), code, confirmationData.getCode());
+            Checker.checkIdAndCode(operationId, confirmationData.operationId(), code, confirmationData.code());
         } catch (BadRequestException e) {
             EventLogger.logBadRequestException(e, cardFromNumber, cardToNumber,cardFromCVV, cardFromValidTill);
             throw new BadRequestException(e.getExceptionData());

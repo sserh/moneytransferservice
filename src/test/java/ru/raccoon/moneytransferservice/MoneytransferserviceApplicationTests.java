@@ -18,7 +18,7 @@ import java.net.URI;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MoneytransferserviceApplicationTests {
 
-    private static final GenericContainer<?> app = new GenericContainer<>("app:1.0")
+    private static final GenericContainer<?> app = new GenericContainer<>("app:1.1")
             .withExposedPorts(5500);
 
     @Autowired
