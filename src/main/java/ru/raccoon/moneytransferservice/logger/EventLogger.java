@@ -8,7 +8,7 @@ import ru.raccoon.moneytransferservice.utils.UtilClass;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-public class MyLogger {
+public class EventLogger {
 
     public static NumberFormat formatter = new DecimalFormat("#0.00");
 

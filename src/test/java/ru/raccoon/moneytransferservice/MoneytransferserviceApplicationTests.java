@@ -1,13 +1,75 @@
 package ru.raccoon.moneytransferservice;
 
+import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.shaded.org.bouncycastle.asn1.ocsp.Request;
+import ru.raccoon.moneytransferservice.model.Amount;
+import ru.raccoon.moneytransferservice.model.OperationId;
+import ru.raccoon.moneytransferservice.model.Transfer;
 
-@SpringBootTest
+import java.net.URI;
+import java.util.Objects;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MoneytransferserviceApplicationTests {
 
-    @Test
-    void contextLoads() {
+    private static final GenericContainer<?> app = new GenericContainer<>("app:1.0")
+            .withExposedPorts(5500);
+
+    @Autowired
+    TestRestTemplate restTemplate;
+
+    @LocalServerPort
+    int port;
+
+    @BeforeAll
+    public static void setup() {
+        app.start();
     }
 
+    @Test
+    void checkGetResponseOK() {
+
+        final String baseUrl = "http://localhost:" + port + "/transfer";
+        URI uri = URI.create(baseUrl);
+        //подготовим валидные данные, должны получить 200
+        Transfer transfer = new Transfer(
+                "1111111111111111",
+                "2222222222222222",
+                "08/28",
+                "333",
+                new Amount(24500, "RUR"));
+
+        HttpEntity<Transfer> request = new HttpEntity<>(transfer);
+        ResponseEntity<String> response = restTemplate.postForEntity(uri, request, String.class);
+        Assertions.assertEquals(200, response.getStatusCode().value());
+    }
+
+    @Test
+    void checkGetResponseBadRequest() {
+
+        final String baseUrl = "http://localhost:" + port + "/transfer";
+        URI uri = URI.create(baseUrl);
+        //отправим 13 месяц в сроке действия карты, должны получить 400
+        Transfer transfer = new Transfer(
+                "1111111111111111",
+                "2222222222222222",
+                "13/28",
+                "333",
+                new Amount(24500, "RUR"));
+
+        HttpEntity<Transfer> request = new HttpEntity<>(transfer);
+        ResponseEntity<String> response = restTemplate.postForEntity(uri, request, String.class);
+        Assertions.assertEquals(400, response.getStatusCode().value());
+    }
 }

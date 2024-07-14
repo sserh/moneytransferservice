@@ -8,7 +8,7 @@ import ru.raccoon.moneytransferservice.checker.Checker;
 import ru.raccoon.moneytransferservice.exception.BadRequestException;
 import ru.raccoon.moneytransferservice.exception.ExceptionData;
 import ru.raccoon.moneytransferservice.exception.ISEException;
-import ru.raccoon.moneytransferservice.logger.MyLogger;
+import ru.raccoon.moneytransferservice.logger.EventLogger;
 import ru.raccoon.moneytransferservice.model.ConfirmationData;
 import ru.raccoon.moneytransferservice.model.OperationId;
 import ru.raccoon.moneytransferservice.model.Transfer;
@@ -46,10 +46,10 @@ public class TransferService {
         try {
             Checker.checkTransferParams(cardFromNumber, cardToNumber, cardFromCVV, cardFromValidTill, value);
         } catch (BadRequestException e) {
-            MyLogger.logBadRequestException(e, cardFromNumber, cardToNumber,cardFromCVV, cardFromValidTill);
+            EventLogger.logBadRequestException(e, cardFromNumber, cardToNumber,cardFromCVV, cardFromValidTill);
             throw new BadRequestException(e.getExceptionData());
         } catch (RuntimeException e) {
-            MyLogger.logISEException(e);
+            EventLogger.logISEException(e);
             throw new ISEException(new ExceptionData(ERROR_500, 1011));
         }
 
@@ -62,13 +62,13 @@ public class TransferService {
         try {
             Checker.checkIdAndCode(operationId, confirmationData.getOperationId(), code, confirmationData.getCode());
         } catch (BadRequestException e) {
-            MyLogger.logBadRequestException(e, cardFromNumber, cardToNumber,cardFromCVV, cardFromValidTill);
+            EventLogger.logBadRequestException(e, cardFromNumber, cardToNumber,cardFromCVV, cardFromValidTill);
             throw new BadRequestException(e.getExceptionData());
         } catch (RuntimeException e) {
-            MyLogger.logISEException(e);
+            EventLogger.logISEException(e);
             throw new ISEException(new ExceptionData(ERROR_500, 1012));
         }
-        MyLogger.lodSuccessTransfer(cardFromNumber, cardToNumber, cardFromValidTill, cardFromCVV, value, currency, transferSum, comSum);
+        EventLogger.lodSuccessTransfer(cardFromNumber, cardToNumber, cardFromValidTill, cardFromCVV, value, currency, transferSum, comSum);
         return new ResponseEntity<>(new OperationId(operationId), HttpStatus.OK);
     }
 }
