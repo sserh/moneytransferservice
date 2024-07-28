@@ -2,10 +2,13 @@ package ru.raccoon.moneytransferservice.exception;
 
 import lombok.Getter;
 
+/**
+ * Класс исключения BadRequest
+ */
 @Getter
 public class BadRequestException extends RuntimeException {
 
-    ExceptionData exceptionData;
+    private final ExceptionData exceptionData;
 
     public BadRequestException(ExceptionData exceptionData) {
         this.exceptionData = exceptionData;

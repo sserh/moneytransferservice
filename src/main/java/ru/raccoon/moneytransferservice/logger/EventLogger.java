@@ -8,12 +8,17 @@ import ru.raccoon.moneytransferservice.utils.UtilClass;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+/**
+ * Класс логгера
+ */
 public class EventLogger {
 
-    public static NumberFormat formatter = new DecimalFormat("#0.00");
+    public static final NumberFormat formatter = new DecimalFormat("#0.00");
 
     public static final Logger logger = LogManager.getLogger("my-logger-name");
 
+    /** Метод, логгирующий данные об исключении BadRequest
+     */
     public static void logBadRequestException(BadRequestException e,
                                               String cardFromNumber,
                                               String cardToNumber,
@@ -24,11 +29,13 @@ public class EventLogger {
                 "Карта получателя: " + UtilClass.addSpaceToCardNumber(cardToNumber),
                 "Срок действия карты отправителя: " + cardFromValidTill,
                 "CVV карты отправителя: " + cardFromCVV,
-                "message_id = " + e.getExceptionData().getId(),
-                "message = " + e.getExceptionData().getMessage(),
+                "message_id = " + e.getExceptionData().id(),
+                "message = " + e.getExceptionData().message(),
                 "-------------------------------");
     }
 
+    /** Метод, логгирующий данные об исключении InternalServerError
+     */
     public static void logISEException(RuntimeException e) {
         logger.error("\n{}\n{}\n{}",
                 e.getMessage(),
@@ -36,6 +43,8 @@ public class EventLogger {
                 "-------------------------------");
     }
 
+    /** Метод, логгирующий данные об успешном переводе
+     */
     public static void lodSuccessTransfer(String cardFromNumber,
                                           String cardToNumber,
                                           String cardFromValidTill,

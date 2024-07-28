@@ -2,11 +2,23 @@ package ru.raccoon.moneytransferservice.checker;
 
 import ru.raccoon.moneytransferservice.exception.BadRequestException;
 import ru.raccoon.moneytransferservice.exception.ExceptionData;
+import ru.raccoon.moneytransferservice.repositories.TransfersRepo;
 
 import java.util.Calendar;
 
+/**
+ * Класс с методами для проверки входных данных от клиента
+ */
 public class Checker {
 
+    /**
+     * Этот метод проверяет, корректные ли данные для осуществления перевода прислал нам клиент
+     * @param cardFromNumber Номер карты, с которой осуществляется перевод
+     * @param cardToNumber Номер карты, на которую осуществляется перевод
+     * @param cardFromCVV Проверочный код карты, с которой осуществляется перевод
+     * @param cardFromValidTill Срок действия карты, с которой осуществляется перевод
+     * @param value Сумма для перевода.
+     */
     public static void checkTransferParams(String cardFromNumber, String cardToNumber, String cardFromCVV, String cardFromValidTill, int value) {
 
         //блок проверки правильности указания данных карты (кроме срока действия)
@@ -50,12 +62,18 @@ public class Checker {
         }
     }
 
-    public static void checkIdAndCode(String id, String idForCheck, String code, String codeForCheck) {
-        if (!id.equals(idForCheck)) {
+    /**
+     * Этот метод проверяет, корректные ли данные прислал нам клиент в подтверждении
+     * @param idForCheck Идентификатор операции
+     * @param codeForCheck "Код из СМС"
+     */
+    public static void checkIdAndCode(String idForCheck, String codeForCheck) {
+        if (!TransfersRepo.isTransferExist(idForCheck)) {
             throw new BadRequestException(new ExceptionData("Получен неожидаемый идентификатор операции. Перевод не может быть исполнен", 1009));
-        }
-        if (!code.equals(codeForCheck)) {
-            throw new BadRequestException(new ExceptionData("Получен неправильный код подтверждения. Перевод не может быть исполнен", 1010));
+        } else {
+            if (!(TransfersRepo.getCode(idForCheck)).equals(codeForCheck)) {
+                throw new BadRequestException(new ExceptionData("Получен неправильный код подтверждения. Перевод не может быть исполнен", 1010));
+            }
         }
     }
 }

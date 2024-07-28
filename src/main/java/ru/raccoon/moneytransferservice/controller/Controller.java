@@ -12,17 +12,27 @@ import ru.raccoon.moneytransferservice.service.TransferService;
 @RestController
 public class Controller {
 
-    TransferService transferService;
+    private final TransferService transferService;
 
     public Controller(TransferService transferService) {
         this.transferService = transferService;
     }
 
+    /**
+     * Метод подготавливает и отправляет клиенту ответ на основании полученных от клиента данных о переводе
+     * @param transfer Данные о переводе от клиента
+     * @return Возвращает результат обработки сервисом данных о переводе
+     */
     @PostMapping("/transfer")
     public ResponseEntity<OperationId> getTransferParams(@RequestBody Transfer transfer) {
         return transferService.getTransferResponse(transfer);
     }
 
+    /**
+     * Метод подготавливает и отпраялет клиенту ответ о результате обработки подтверждения перевода
+     * @param confirmationData Данные для подтверждения перевода
+     * @return Возвращает результат обработки сервисом данных для подтверждения перевода
+     */
     @PostMapping("/confirmOperation")
     public ResponseEntity<OperationId> confirmOperation(@RequestBody ConfirmationData confirmationData) {
         return transferService.getConfirmationResponse(confirmationData);

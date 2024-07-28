@@ -1,16 +1,9 @@
 package ru.raccoon.moneytransferservice.exception;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class ExceptionData {
-    String message;
-    Integer id;
-
-    public ExceptionData(String message, Integer id) {
-        this.message = message;
-        this.id = id;
-    }
+/**
+ * Класс для "упаковки" подробностей исключений для отправки их клиенту
+ * @param message Сообщение для клиента
+ * @param id Идентификатор типа сообщения
+ */
+public record ExceptionData(String message, Integer id) {
 }

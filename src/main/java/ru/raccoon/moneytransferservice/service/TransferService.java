@@ -1,6 +1,7 @@
 package ru.raccoon.moneytransferservice.service;
 
 
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,63 +13,69 @@ import ru.raccoon.moneytransferservice.logger.EventLogger;
 import ru.raccoon.moneytransferservice.model.ConfirmationData;
 import ru.raccoon.moneytransferservice.model.OperationId;
 import ru.raccoon.moneytransferservice.model.Transfer;
-import ru.raccoon.moneytransferservice.utils.UtilClass;
+import ru.raccoon.moneytransferservice.repositories.TransfersRepo;
 
+/**
+ * Класс, реализующий сервис, обрабатывающий детали пользовательских данных о переволе и о подтверждении перевода
+ */
 @Service
+@Data
 public class TransferService {
 
-    String cardFromNumber;
-    String cardToNumber;
-    String cardFromValidTill;
-    String cardFromCVV;
-    int value;
-    String currency;
-    double transferSum;
-    double comSum;
-    String operationId;
-    String code = "0000"; //front всегда отправляет такой код подтверждения
-    final String ERROR_500 = "Внутренняя ошибка сервера. Мы уже работаем над её устранением";
+    private final String ERROR_500 = "Внутренняя ошибка сервера. Мы уже работаем над её устранением";
 
-
+    /** Метод, обрабатывающий данные о переводе, полученные от пользователя
+     * @param transfer
+     * @return
+     */
     public ResponseEntity<OperationId> getTransferResponse(Transfer transfer) {
 
-        this.cardFromNumber = transfer.cardFromNumber();
-        this.cardToNumber = transfer.cardToNumber();
-        this.cardFromValidTill = transfer.cardFromValidTill();
-        this.cardFromCVV = transfer.cardFromCVV();
-        this.value = transfer.amount().value()/100;
-        this.currency = transfer.amount().currency();
-        this.transferSum = value*99d/100;
-        this.comSum = value - transferSum;
-        this.operationId = UtilClass.generateOperationId();
-
-        //осуществляем проверку полученных данных
         try {
-            Checker.checkTransferParams(cardFromNumber, cardToNumber, cardFromCVV, cardFromValidTill, value);
+            Checker.checkTransferParams(transfer.getCardFromNumber(), transfer.getCardToNumber(), transfer.getCardFromCVV(), transfer.getCardFromValidTill(), transfer.getValue());
         } catch (BadRequestException e) {
-            EventLogger.logBadRequestException(e, cardFromNumber, cardToNumber,cardFromCVV, cardFromValidTill);
+            //если данные некорректные, то пишем всё что надо в лог
+            EventLogger.logBadRequestException(e, transfer.getCardFromNumber(), transfer.getCardToNumber(), transfer.getCardFromCVV(), transfer.getCardFromValidTill());
+            //и выкидываем исключение
             throw new BadRequestException(e.getExceptionData());
         } catch (RuntimeException e) {
+            //если проблема есть, и она не в неверных данных, то это ошибка сервера.
+            //пишем в лог конкртеную ошибку
             EventLogger.logISEException(e);
+            //но пользователю необязательно знать, что конкретно мы плохо накодили, отправим только то, что "мы работаем над этим"
             throw new ISEException(new ExceptionData(ERROR_500, 1011));
         }
 
-        return new ResponseEntity<>(new OperationId(operationId), HttpStatus.OK);
+        //если все данные верные, то добавим транзакцию в репозиторий и будем ждать confirmation
+        TransfersRepo.addTransfer(transfer.getOperationId(), transfer);
+
+        return new ResponseEntity<>(new OperationId(transfer.getOperationId()), HttpStatus.OK);
     }
 
+    /** Метод, обрабатывающий параметры подтверждения перевода, полученные от пользователя
+     * @param confirmationData
+     * @return
+     */
     public ResponseEntity<OperationId> getConfirmationResponse(ConfirmationData confirmationData) {
+
+        //Найдём в репозитории данные о трансфере
+        Transfer transfer = TransfersRepo.getTransfer(confirmationData.operationId());
 
         //проверяем совпадение Id операции и кода подтверждения
         try {
-            Checker.checkIdAndCode(operationId, confirmationData.operationId(), code, confirmationData.code());
+            Checker.checkIdAndCode(confirmationData.operationId(), confirmationData.code());
         } catch (BadRequestException e) {
-            EventLogger.logBadRequestException(e, cardFromNumber, cardToNumber,cardFromCVV, cardFromValidTill);
+            //если идентифакатор операции или "код из смс" некорректные, то выкидываем соответствующие исключения
+            EventLogger.logBadRequestException(e, transfer.getCardFromNumber(), transfer.getCardToNumber(), transfer.getCardFromCVV(), transfer.getCardFromValidTill());
             throw new BadRequestException(e.getExceptionData());
         } catch (RuntimeException e) {
             EventLogger.logISEException(e);
             throw new ISEException(new ExceptionData(ERROR_500, 1012));
         }
-        EventLogger.lodSuccessTransfer(cardFromNumber, cardToNumber, cardFromValidTill, cardFromCVV, value, currency, transferSum, comSum);
-        return new ResponseEntity<>(new OperationId(operationId), HttpStatus.OK);
+        //если всё хорошо, то пишем данные по операции в лог
+        EventLogger.lodSuccessTransfer(transfer.getCardFromNumber(), transfer.getCardToNumber(), transfer.getCardFromValidTill(), transfer.getCardFromCVV(),
+                transfer.getValue(), transfer.getCurrency(), transfer.getTransferSum(), transfer.getComSum());
+        //удаялем из репозитория ненужные больше данные о запросе на трансфер
+        TransfersRepo.removeTransfer(confirmationData.operationId());
+        return new ResponseEntity<>(new OperationId(confirmationData.operationId()), HttpStatus.OK);
     }
 }
