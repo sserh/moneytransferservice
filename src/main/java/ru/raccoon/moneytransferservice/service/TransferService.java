@@ -16,7 +16,7 @@ import ru.raccoon.moneytransferservice.model.Transfer;
 import ru.raccoon.moneytransferservice.repositories.TransfersRepo;
 
 /**
- * Класс, реализующий сервис, обрабатывающий детали пользовательских данных о переволе и о подтверждении перевода
+ * Класс, реализующий сервис, обрабатывающий детали пользовательских данных о переводе и о подтверждении перевода
  */
 @Service
 @Data
@@ -25,8 +25,8 @@ public class TransferService {
     private final String ERROR_500 = "Внутренняя ошибка сервера. Мы уже работаем над её устранением";
 
     /** Метод, обрабатывающий данные о переводе, полученные от пользователя
-     * @param transfer
-     * @return
+     * @param transfer Данные о переводе, полученные от пользователя
+     * @return Возвращает идентификатор операции либо исключения BadRequest или InternalServerError
      */
     public ResponseEntity<OperationId> getTransferResponse(Transfer transfer) {
 
@@ -39,7 +39,7 @@ public class TransferService {
             throw new BadRequestException(e.getExceptionData());
         } catch (RuntimeException e) {
             //если проблема есть, и она не в неверных данных, то это ошибка сервера.
-            //пишем в лог конкртеную ошибку
+            //пишем в лог конкретную ошибку
             EventLogger.logISEException(e);
             //но пользователю необязательно знать, что конкретно мы плохо накодили, отправим только то, что "мы работаем над этим"
             throw new ISEException(new ExceptionData(ERROR_500, 1011));
@@ -52,8 +52,8 @@ public class TransferService {
     }
 
     /** Метод, обрабатывающий параметры подтверждения перевода, полученные от пользователя
-     * @param confirmationData
-     * @return
+     * @param confirmationData Данные для подтверждения перевода, полученные от пользователя
+     * @return Возвращает идентификатор успешно проведённого перевода либо исключения BadRequest или InternalServerError
      */
     public ResponseEntity<OperationId> getConfirmationResponse(ConfirmationData confirmationData) {
 

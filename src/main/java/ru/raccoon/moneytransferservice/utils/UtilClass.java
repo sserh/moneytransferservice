@@ -17,7 +17,7 @@ public final class UtilClass {
         return builder.toString();
     }
 
-    /**Метод для генерации идентифкатора операции
+    /**Метод для генерации идентификатора операции
      * @return Возвращает идентификатор в строковом формате
      */
     public static String generateOperationId() {

@@ -42,7 +42,7 @@ public class Checker {
         int cardFromYearValidTill = Integer.parseInt(cardFromValidTill.substring(3));
         //номер текущего месяца приводим к HumanReadable-формату
         int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        //делаем допущение, что срок дейсствия карты может распространятся только на 21 век
+        //делаем допущение, что срок действия карты может распространяться только на 21 век
         int currentYear = Calendar.getInstance().get(Calendar.YEAR) - 2000;
 
         if ((cardFromMonthValidTill < 1) || (cardFromMonthValidTill > 12)) {
@@ -58,7 +58,7 @@ public class Checker {
 
         //блок проверки правильности указанной суммы переводы
         if (!(value > 0)) {
-            throw new BadRequestException(new ExceptionData("Указана некорретная сумма перевода", 1008));
+            throw new BadRequestException(new ExceptionData("Указана некорректная сумма перевода", 1008));
         }
     }
 
